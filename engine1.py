@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal
 from PyQt5.QtGui import QPainter, QColor
 from PyQt5.QtWidgets import QFrame
 
-class Board(QFrame):
+class Poletetris(QFrame):
 
     msg2Statusbar = pyqtSignal(str)
     game_over_signal = QtCore.pyqtSignal()
@@ -12,7 +12,7 @@ class Board(QFrame):
 
     BoardWidth = 10
     BoardHeight = 20
-    Speed = 300
+    
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -26,7 +26,7 @@ class Board(QFrame):
 
         self.timer = QBasicTimer()
         self.isWaitingAfterLine = False
-
+        self.speed = 300
         self.curX = 0
         self.curY = 0
         self.numLinesRemoved = 0
@@ -37,22 +37,6 @@ class Board(QFrame):
         self.isPaused = False
         self.clearBoard()
 
-    def drawProjection(self, painter):
-        if self.curPiece.shape() == Tetrominoe.NoShape:
-            return
-
-        projectionPiece = self.curPiece
-        projectionX = self.curX
-        projectionY = self.curY
-
-        while self.tryMove(projectionPiece, projectionX, projectionY - 1):
-            projectionY -= 1
-
-        for i in range(4):
-            x = projectionX + projectionPiece.x(i)
-            y = projectionY - projectionPiece.y(i)
-            self.drawSquare(painter, self.squareWidth() * x, self.squareHeight() * y,
-                            Tetrominoe.ProjectionShape)
 
     def start(self):
         self.clearBoard()
@@ -67,7 +51,7 @@ class Board(QFrame):
         self.msg2Statusbar.emit(str(self.numLinesRemoved))
 
         self.newPiece()
-        self.timer.start(Board.Speed, self)
+        self.timer.start(self.speed, self)
 
     def savePiece(self):
         if not self.isSavedPiece:
@@ -80,24 +64,24 @@ class Board(QFrame):
 
             self.curPiece = self.savedPiece
             self.curPiece.setShape(self.savedPiece.shape())
-            self.curX = Board.BoardWidth // 2 + 1
-            self.curY = Board.BoardHeight - 1 + self.curPiece.minY()
+            self.curX = Poletetris.BoardWidth // 2 + 1
+            self.curY = Poletetris.BoardHeight - 1 + self.curPiece.minY()
             self.newPiece()  # Исправленный вызов метода
             self.update()
         else:
             self.savePiece()  # Если нет сохраненной фигуры, сохраняем текущую
 
     def shapeAt(self, x, y):
-        return self.board[(y * Board.BoardWidth) + x]
+        return self.board[(y * Poletetris.BoardWidth) + x]
 
     def setShapeAt(self, x, y, shape):
-        self.board[(y * Board.BoardWidth) + x] = shape
+        self.board[(y * Poletetris.BoardWidth) + x] = shape
 
     def squareWidth(self):
-        return self.rect().width() // Board.BoardWidth
+        return self.rect().width() // Poletetris.BoardWidth
 
     def squareHeight(self):
-        return self.rect().height() // Board.BoardHeight
+        return self.rect().height() // Poletetris.BoardHeight
 
     def pause(self):
 
@@ -111,7 +95,7 @@ class Board(QFrame):
             self.msg2Statusbar.emit("paused")
 
         else:
-            self.timer.start(Board.Speed, self)
+            self.timer.start(self.speed, self)
             self.msg2Statusbar.emit(str(self.numLinesRemoved))
 
         self.update()
@@ -121,7 +105,7 @@ class Board(QFrame):
             return
 
         self.isPaused = False
-        self.timer.start(Board.Speed, self)
+        self.timer.start(self.speed, self)
         self.msg2Statusbar.emit(str(self.numLinesRemoved))
 
         self.update()
@@ -133,24 +117,24 @@ class Board(QFrame):
         rect = self.rect()
         boardTop = rect.top()
         
-        squareWidth = rect.width() // Board.BoardWidth
-        squareHeight = rect.height() // Board.BoardHeight
+        squareWidth = rect.width() // Poletetris.BoardWidth
+        squareHeight = rect.height() // Poletetris.BoardHeight
         painter.setPen(QColor(0, 0, 0))
 
         # Рисование вертикальных линий
-        for x in range(Board.BoardWidth + 1):
+        for x in range(Poletetris.BoardWidth + 1):
             painter.drawLine(rect.left() + x * squareWidth, boardTop,
                             rect.left() + x * squareWidth, boardTop + rect.height())
 
         # Рисование горизонтальных линий
-        for y in range(Board.BoardHeight + 1):
+        for y in range(Poletetris.BoardHeight + 1):
             painter.drawLine(rect.left(), boardTop + y * squareHeight,
                             rect.left() + rect.width(), boardTop + y * squareHeight)
 
         # Рисование заполненных клеток на игровом поле
-        for y in range(Board.BoardHeight):
-            for x in range(Board.BoardWidth):
-                shape = self.shapeAt(x, Board.BoardHeight - y - 1)
+        for y in range(Poletetris.BoardHeight):
+            for x in range(Poletetris.BoardWidth):
+                shape = self.shapeAt(x, Poletetris.BoardHeight - y - 1)
 
                 if shape != Tetrominoe.NoShape:
                     self.drawSquare(painter,
@@ -163,13 +147,13 @@ class Board(QFrame):
                 x = self.curX + self.curPiece.x(i)
                 y = self.curY - self.curPiece.y(i)
                 self.drawSquare(painter, rect.left() + x * squareWidth,
-                                boardTop + (Board.BoardHeight - y - 1) * squareHeight,
+                                boardTop + (Poletetris.BoardHeight - y - 1) * squareHeight,
                                 self.curPiece.shape())
 
     def keyPressEvent(self, event):
 
         if not self.isStarted or self.curPiece.shape() == Tetrominoe.NoShape:
-            super(Board, self).keyPressEvent(event)
+            super(Poletetris, self).keyPressEvent(event)
             return
 
         key = event.key()
@@ -205,7 +189,7 @@ class Board(QFrame):
             return
 
         else:
-            super(Board, self).keyPressEvent(event)
+            super(Poletetris, self).keyPressEvent(event)
 
     def timerEvent(self, event):
 
@@ -218,11 +202,11 @@ class Board(QFrame):
                 self.oneLineDown()
 
         else:
-            super(Board, self).timerEvent(event)
+            super(Poletetris, self).timerEvent(event)
 
     def clearBoard(self):
 
-        for i in range(Board.BoardHeight * Board.BoardWidth):
+        for i in range(Poletetris.BoardHeight * Poletetris.BoardWidth):
             self.board.append(Tetrominoe.NoShape)
 
     def dropDown(self):
@@ -260,11 +244,12 @@ class Board(QFrame):
 
         numFullLines = 0
         rowsToRemove = []
+        self.speed += 50
 
-        for i in range(Board.BoardHeight):
+        for i in range(Poletetris.BoardHeight):
 
             n = 0
-            for j in range(Board.BoardWidth):
+            for j in range(Poletetris.BoardWidth):
                 if not self.shapeAt(j, i) == Tetrominoe.NoShape:
                     n = n + 1
 
@@ -276,8 +261,8 @@ class Board(QFrame):
 
         for m in rowsToRemove:
 
-            for k in range(m, Board.BoardHeight):
-                for l in range(Board.BoardWidth):
+            for k in range(m, Poletetris.BoardHeight):
+                for l in range(Poletetris.BoardWidth):
                         self.setShapeAt(l, k, self.shapeAt(l, k + 1))
 
         numFullLines = numFullLines + len(rowsToRemove)
@@ -290,13 +275,14 @@ class Board(QFrame):
             self.isWaitingAfterLine = True
             self.curPiece.setShape(Tetrominoe.NoShape)
             self.update()
+            print(self.speed)
 
     def newPiece(self):
 
         self.curPiece = Shape()
         self.curPiece.setRandomShape()
-        self.curX = Board.BoardWidth // 2 + 1
-        self.curY = Board.BoardHeight - 1 + self.curPiece.minY()
+        self.curX = Poletetris.BoardWidth // 2 + 1
+        self.curY = Poletetris.BoardHeight - 1 + self.curPiece.minY()
 
         if not self.tryMove(self.curPiece, self.curX, self.curY):
 
@@ -313,7 +299,7 @@ class Board(QFrame):
             x = newX + newPiece.x(i)
             y = newY - newPiece.y(i)
 
-            if x < 0 or x >= Board.BoardWidth or y < 0 or y >= Board.BoardHeight:
+            if x < 0 or x >= Poletetris.BoardWidth or y < 0 or y >= Poletetris.BoardHeight:
                 return False
 
             if self.shapeAt(x, y) != Tetrominoe.NoShape:
@@ -478,3 +464,4 @@ class Shape(object):
             result.setY(i, self.x(i))
 
         return result
+

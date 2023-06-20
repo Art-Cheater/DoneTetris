@@ -2,15 +2,15 @@ import sys
 import os
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QDesktopWidget, QMessageBox
-from engine2 import Board2
-from engine1 import Board
-from engine3 import TetrisGame
+from engine2 import Poletetris2
+from engine1 import Poletetris
+# from engine3 import Poletetris
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
     def setupUi(self, MainWindow):
         self.main_window = MainWindow 
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(360, 760)
+        MainWindow.resize(400, 550)
         self.setStyleSheet("background-color: rgb(245,255,250);")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -194,7 +194,7 @@ class Tetris(QMainWindow):
         self.initUI()
 
     def initUI(self):
-        self.tboard = Board(self)
+        self.tboard = Poletetris(self)
         self.main_window = MainWindow
         self.setCentralWidget(self.tboard)
         self.resize(360, 760)
@@ -290,7 +290,7 @@ class Tetris2(QMainWindow):
         self.initUI()
 
     def initUI(self):
-        self.tboard = Board2(self) 
+        self.tboard = Poletetris2(self) 
         self.main_window = MainWindow
         self.setCentralWidget(self.tboard)
         self.resize(360, 760)
